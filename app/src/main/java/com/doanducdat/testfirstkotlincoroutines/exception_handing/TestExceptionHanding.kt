@@ -84,17 +84,25 @@ fun c4(){
                 throw NullPointerException()
             }
             val job2 = launch {
-                println("job 2")
-                throw NullPointerException()
+                job1.join()
+                println("hi! job 2, job 1 isActive: ${job1.isActive}")
+                try {
+                    delay(2000)
+                }finally {
+                    println("2s have passed")
+                }
             }
-            val job3 = launch {
-                println("job 3")
-                throw NullPointerException()
-            }
+            job1.join()
+            println("Hello!")
+            supervisor.cancel()
+            job2.join()
         }
+
     }
 }
+fun c5Supervisor(){
 
+}
 fun main() {
     /*// c1: dung try cathc (Nhan loi) - throw( nem loi) launch
     // c2: dung await(nhan loi) - throw (nem loi) async
@@ -108,8 +116,10 @@ fun main() {
      con lai da bi suppress
      */
     //c3vsMultiException()
-    //c4: dung supervisor job,
-    // (job thông thường : job cha bị hủy, sẽ hủy all job con bên trong) # (supervisor job bị hủy, job con vẫn sẽ chạy tiếp)
 
-
+    /*C4: dung supervisor job,
+        (job thông thường : job cha bị hủy, sẽ hủy all job con bên trong kể cả finally)
+        #
+        (supervisor job bị hủy, try - finally vẫn chạy được, k có try mà có delay thì supervisor cũng bay màu)*/
+    c4()
 }
