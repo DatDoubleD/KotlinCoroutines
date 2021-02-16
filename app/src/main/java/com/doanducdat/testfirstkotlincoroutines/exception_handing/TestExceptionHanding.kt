@@ -75,7 +75,7 @@ fun c3vsMultiException() {
 
 }
 
-fun c4(){
+fun c4SupervisorJob(){
     runBlocking {
         val supervisor = SupervisorJob()
         with(CoroutineScope(coroutineContext + supervisor)){
@@ -100,16 +100,37 @@ fun c4(){
 
     }
 }
-fun c5Supervisor(){
 
+fun c5SupervisorScope(){
+    //job 1 da bi huy nhung job 2 van chay
+    //-> giong supervisorJob nhung day la tao moi 1 scope moi thay vi dung with vs coroutines scope
+    runBlocking {
+        supervisorScope {
+            val job1 = launch {
+                println("job 1")
+                throw NullPointerException()
+            }
+            val job2 = launch {
+                job1.join()
+                println("hi! job 2, job 1 isActive: ${job1.isActive}")
+                try {
+                    delay(2000)
+                }finally {
+                    println("2s have passed")
+                }
+            }
+            job1.join()
+            job2.join()
+        }
+    }
 }
 fun main() {
     /*// c1: dung try cathc (Nhan loi) - throw( nem loi) launch
-    // c2: dung await(nhan loi) - throw (nem loi) async
-    //c1andc2()*/
+    // c2: dung await(nhan loi) - throw (nem loi) doi voi async*/
+    //c1andc2()
 
-    /*// c3: dung handler
-    //c3()*/
+    /*// c3: dung handler*/
+    //c3()
 
     /*Exception aggregation
      c3 with multi exception: nhieu coroutine cung 1 loi -> handler chi xu ly loi dau tien, nhung cai
@@ -119,7 +140,10 @@ fun main() {
 
     /*C4: dung supervisor job,
         (job thông thường : job cha bị hủy, sẽ hủy all job con bên trong kể cả finally)
+        (1 coroutine con bi loi -> coroutine khac se stop)
         #
-        (supervisor job bị hủy, try - finally vẫn chạy được, k có try mà có delay thì supervisor cũng bay màu)*/
-    c4()
+        (1 trong coroutine con bi loi thi cac coroutine khac van chay)
+        (supervisor job: job cha bị hủy, try - finally vẫn chạy được, */
+    //c4SupervisorJob()
+
 }
